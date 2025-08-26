@@ -134,7 +134,7 @@ class WhisperSubmitGUI(QtWidgets.QWidget):
         self.model_combo.setCurrentText(self.job.model)
         #self.model_dir_edit.setText(self.job.model_dir)
         self.output_dir_edit.setText(self.job.output_dir)
-        self.version_label.setText(whisper_gui_version)
+        self.version_label.setText("whisper-gui-" + whisper_gui_version)
 
     def set_status(self, status):
         """Update the status control with the current job status."""
