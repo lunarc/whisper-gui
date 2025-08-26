@@ -179,6 +179,7 @@ class WhisperSubmitGUI(QtWidgets.QWidget):
 
         if file_name:
             self.audio_filename_edit.setText(file_name)
+            self.output_dir_edit.setText(os.path.dirname(file_name))
 
     @pyqtSlot()
     def on_select_output_dir_button_clicked(self):
