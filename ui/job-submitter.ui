@@ -282,7 +282,7 @@
       <widget class="QLineEdit" name="output_dir_edit"/>
      </item>
      <item row="9" column="1">
-      <widget class="QLineEdit" name="lineEdit">
+      <widget class="QLineEdit" name="account_edit">
        <property name="placeholderText">
         <string>If user is part of multiple project</string>
        </property>

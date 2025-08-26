@@ -260,8 +260,13 @@ class Slurm(object):
 
         p = Popen("sbatch", stdout=PIPE, stdin=PIPE, stderr=PIPE,
                   shell=True, universal_newlines=True)
-        
-        sbatch_output = p.communicate(input=job.script)[0].strip()
+
+        sbatch_stdout, sbatch_stderr = p.communicate(input=job.script)
+        sbatch_output = sbatch_stdout.strip()
+        sbatch_error = sbatch_stderr.strip()
+
+        # Store error info in job
+        job.error_info = sbatch_error if sbatch_error else None
 
         if sbatch_output.find("Submitted batch") != -1:
             job.id = int(sbatch_output.split()[3])
@@ -274,6 +279,7 @@ class Slurm(object):
         """Query status of job"""
         p = Popen("squeue -j " + str(job.id) + " -t PD,R -h -o '%t;%N;%L;%M;%l'",
                   stdout=PIPE, stderr=PIPE, shell=True, universal_newlines=True)
+        
         squeue_output = p.communicate()[0].strip().split(";")
 
         #print(squeue_output)

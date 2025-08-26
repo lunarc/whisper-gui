@@ -69,6 +69,7 @@ class WhisperJob:
         self.account = account
         self.id = 0
         self.dummy_job = True
+        self.output = ""
 
     def check(self):
         if not os.path.exists(self.audio_file):
@@ -77,6 +78,7 @@ class WhisperJob:
             raise FileNotFoundError(f"Output directory not found: {self.output_dir}")
 
     def setup(self):
+        self.output = ""
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
 

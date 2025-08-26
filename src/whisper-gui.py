@@ -6,6 +6,7 @@ import sys
 import time
 
 from PyQt5 import QtWidgets, uic
+from PyQt5.QtWidgets import QMessageBox
 
 from PyQt5.QtCore import pyqtSlot, QThread, pyqtSignal
 from enum import Enum, auto
@@ -31,6 +32,7 @@ class JobSubmitThread(QThread):
     status_update = pyqtSignal(object)  # Will emit JobStatus
     error = pyqtSignal(str)
     submitted = pyqtSignal(str)
+    submit_failure = pyqtSignal(int, str)
 
     def __init__(self, job):
         """Initialize the job submission thread."""
@@ -40,6 +42,7 @@ class JobSubmitThread(QThread):
 
         self.slurm = Slurm()
         self.cancel = False
+        self.output = []
 
     def run(self):
         """Run the job submission thread."""
@@ -48,6 +51,8 @@ class JobSubmitThread(QThread):
         if not self.slurm.submit(self.job):
             self.status_update.emit(JobStatus.FAILED)
             self.error.emit("Failed to submit job: \n\n" + str(self.job))
+            print("submit_failure -> ", self.job.id, self.job.error_info)
+            self.submit_failure.emit(self.job.id, self.job.error_info)
             return
 
         self.submitted.emit(str(self.job.id))
@@ -104,6 +109,7 @@ class WhisperSubmitGUI(QtWidgets.QWidget):
         self.job.jobname = self.jobname_edit.text()
         self.job.audio_file = self.audio_filename_edit.text()
         self.job.language = self.language_combo.currentText()
+        self.job.account = self.account_edit.text()
         #self.job.task = self.task_input.text()
         #self.job.device = self.device_input.text()
         self.job.output_format = self.output_format_combo.currentText()
@@ -119,6 +125,7 @@ class WhisperSubmitGUI(QtWidgets.QWidget):
         self.jobname_edit.setText(self.job.jobname)
         self.audio_filename_edit.setText(self.job.audio_file)
         self.language_combo.setCurrentText(self.job.language)
+        self.account_edit.setText(self.job.account)
         #self.task_input.setText(self.job.task)
         #self.device_input.setText(self.job.device)
         self.output_format_combo.setCurrentText(self.job.output_format)
@@ -183,12 +190,14 @@ class WhisperSubmitGUI(QtWidgets.QWidget):
         # Update job information from UI
 
         self.update_job()
+        self.job.setup()
 
         # Validate job information
 
         try:
             self.job.check()
         except FileNotFoundError as e:
+            QMessageBox.information(self, "Job input validation", f"{e}")
             self.log_text.appendPlainText("Error: " + str(e))
             return
 
@@ -199,6 +208,7 @@ class WhisperSubmitGUI(QtWidgets.QWidget):
         self.submit_thread.error.connect(self.on_error)
         self.submit_thread.submitted.connect(self.on_submitted)
         self.submit_thread.finished.connect(self.on_finished)
+        self.submit_thread.submit_failure.connect(self.on_submit_failure)
         self.submit_thread.start()
 
         # Disable the submit button
@@ -263,6 +273,27 @@ class WhisperSubmitGUI(QtWidgets.QWidget):
         self.log_text.appendPlainText("Job finished")
         self.log_text.appendPlainText("Job output: \n\n" + '\n'.join(self.submit_thread.output))
         self.submit_button.setEnabled(True)
+
+    @pyqtSlot(int, str)
+    def on_submit_failure(self, job_id, error_info):
+        """Handle job submission failure."""
+
+        # Parse the error output
+
+        human_error_message = ""
+
+        if "default project" in error_info:
+            human_error_message = "You are member of multiple projects or you don't have a default project assigned." \
+                                  "Please set the project name in the 'Project' field."
+        elif "Invalid account" in error_info and "does not exist" in error_info:
+            human_error_message = "The combination of project and partition is invalid. Please check the " \
+                                  "'Project' and 'Partition' fields."
+
+        QMessageBox.information(self, "Job Submission Failed",
+                             f"Job submission failed: {human_error_message}")
+
+        self.log_text.appendPlainText(f"Job submission failed: {human_error_message}")
+                                      
 
 def main():
     import os
