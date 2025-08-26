@@ -76,7 +76,7 @@ class JobSubmitThread(QThread):
                 emit_once = True
             time.sleep(1)
 
-        self.output = self.slurm.job_output(self.job)
+        self.job.output = self.slurm.job_output(self.job)
         self.status_update.emit(JobStatus.FINISHED)
 
         if self.cancel:
@@ -283,7 +283,7 @@ class WhisperSubmitGUI(QtWidgets.QWidget):
         self.log_text.appendPlainText("Job output: \n\n" + '\n'.join(self.submit_thread.output))
         self.submit_button.setEnabled(True)
 
-        if self.job.output!="":
+        if len(self.job.output)>0:
             subprocess.Popen(['xdg-open', self.job.output_dir])
 
     @pyqtSlot(int, str)
