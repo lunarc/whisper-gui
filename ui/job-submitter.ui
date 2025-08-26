@@ -291,7 +291,7 @@
      <item row="9" column="0">
       <widget class="QLabel" name="label_4">
        <property name="text">
-        <string>Project id</string>
+        <string>Project</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
@@ -439,6 +439,23 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>jobname_edit</tabstop>
+  <tabstop>audio_filename_edit</tabstop>
+  <tabstop>select_audio_file_button</tabstop>
+  <tabstop>model_combo</tabstop>
+  <tabstop>language_combo</tabstop>
+  <tabstop>output_format_combo</tabstop>
+  <tabstop>select_output_dir_button</tabstop>
+  <tabstop>output_dir_edit</tabstop>
+  <tabstop>part_combo</tabstop>
+  <tabstop>account_edit</tabstop>
+  <tabstop>walltime_edit</tabstop>
+  <tabstop>submit_button</tabstop>
+  <tabstop>stop_button</tabstop>
+  <tabstop>close_button</tabstop>
+  <tabstop>log_text</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
