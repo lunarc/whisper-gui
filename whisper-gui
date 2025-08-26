@@ -1,4 +1,21 @@
+
 #!/usr/bin/env bash
-# Bash wrapper for whisper-gui (development mode, project root)
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/src" && pwd)"
-PYTHONPATH="$SCRIPT_DIR" exec python3 "$SCRIPT_DIR/whisper-gui.py" "$@"
+# Bash wrapper for whisper-gui (works with symlinks)
+
+# Resolve the real path of the script, following symlinks
+SOURCE="${BASH_SOURCE[0]}"
+while [ -L "$SOURCE" ]; do
+	DIR="$(cd -P "$(dirname "$SOURCE")" && pwd)"
+	SOURCE="$(readlink "$SOURCE")"
+	[[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
+done
+SCRIPT_DIR="$(cd -P "$(dirname "$SOURCE")" && pwd)"
+PROJECT_ROOT="$SCRIPT_DIR"
+
+# If src/ exists in project root, use it
+if [ -d "$PROJECT_ROOT/src" ]; then
+	PYTHONPATH="$PROJECT_ROOT/src" exec python3 "$PROJECT_ROOT/src/whisper-gui.py" "$@"
+else
+	echo "Could not find src/ directory relative to script location: $PROJECT_ROOT" >&2
+	exit 1
+fi
