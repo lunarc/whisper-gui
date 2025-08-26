@@ -6,16 +6,21 @@ whisper_gui_version = "0.1.0"
 
 import sys
 import time
+import subprocess
+import os
+
+from enum import Enum, auto
 
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import pyqtSlot, QThread, pyqtSignal   
 
-from PyQt5.QtCore import pyqtSlot, QThread, pyqtSignal
-from enum import Enum, auto
+os.environ['QT_QPA_PLATFORMTHEME'] = 'gnome'
+QIcon.setThemeName('Adwaita')
 
 from ui_loader import load_ui
 from whisper import WhisperJob
-
 from lrms_simple import Slurm
 
 class JobStatus(Enum):
@@ -277,6 +282,9 @@ class WhisperSubmitGUI(QtWidgets.QWidget):
         self.log_text.appendPlainText("Job output: \n\n" + '\n'.join(self.submit_thread.output))
         self.submit_button.setEnabled(True)
 
+        if self.job.output!="":
+            subprocess.Popen(['xdg-open', self.job.output_dir])
+
     @pyqtSlot(int, str)
     def on_submit_failure(self, job_id, error_info):
         """Handle job submission failure."""
@@ -296,13 +304,23 @@ class WhisperSubmitGUI(QtWidgets.QWidget):
                              f"Job submission failed: {human_error_message}")
 
         self.log_text.appendPlainText(f"Job submission failed: {human_error_message}")
-                                      
+
+    @pyqtSlot()
+    def on_show_usage_button_clicked(self):
+        """Show usage information."""
+        subprocess.Popen(['gfxusage'])
 
 def main():
-    import os
+
+    # Make sure src is in the Python path
+
     src_dir = os.path.dirname(os.path.abspath(__file__))
+
     if src_dir not in sys.path:
         sys.path.insert(0, src_dir)
+
+    # Start the application
+
     app = QtWidgets.QApplication(sys.argv)
     window = WhisperSubmitGUI()
     window.show()
