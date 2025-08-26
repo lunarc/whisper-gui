@@ -2,7 +2,9 @@
 name = "whisper-slurm-gui"
 version = "0.1.0"
 description = "A Whisper ASR job submission GUI with Slurm integration."
-authors = ["Jonas Lindemann <jonas.lindemann@lunarc.lu.se>"]
+authors = [
+    { name = "Jonas Lindemann", email = "jonas.lindemann@lunarc.lu.se" }
+]
 readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
