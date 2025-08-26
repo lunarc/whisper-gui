@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Bash wrapper for whisper-gui (development mode, project root)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/src" && pwd)"
+PYTHONPATH="$SCRIPT_DIR" exec python3 "$SCRIPT_DIR/whisper-gui.py" "$@"

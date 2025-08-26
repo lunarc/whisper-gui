@@ -1,0 +1,27 @@
+[project]
+name = "whisper-slurm-gui"
+version = "0.1.0"
+description = "A Whisper ASR job submission GUI with Slurm integration."
+authors = ["Jonas Lindemann <jonas.lindemann@lunarc.lu.se>"]
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "PyQt5",
+]
+
+[tool.pdm]
+# Include ui directory and .ui files in the package
+includes = [
+    "src/**.py",
+    "ui/**.ui"
+]
+
+[tool.pdm.build]
+package-dir = "src"
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[project.scripts]
+whisper-gui = "whisper-gui:main"
